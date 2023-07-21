@@ -129,6 +129,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+faithlife_ner_rl_models/
 
 # Spyder project settings
 .spyderproject
