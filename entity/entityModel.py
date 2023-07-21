@@ -24,7 +24,6 @@ class BertForEntity(BertPreTrainedModel):
                  max_span_length=8):
         super().__init__(config)
         self.bert = BertModel(config)
-        print(config)
         self.hidden_dropout = nn.Dropout(config.hidden_dropout_prob)
         self.width_embedding = nn.Embedding(max_span_length + 1,
                                             width_embedding_dim)
@@ -233,7 +232,7 @@ class EntityModel():
                 ignore_mismatched_sizes=True)
 
         self._model_device = 'cpu'
-        # self.move_model_to_cuda()
+        self.move_model_to_cuda()
 
     def move_model_to_cuda(self):
         if not torch.cuda.is_available():
@@ -252,7 +251,6 @@ class EntityModel():
 
         bert_tokens = []
         bert_tokens.append(self.tokenizer.cls_token)
-        print(tokens)
         for token in tokens:
             start2idx.append(len(bert_tokens))
             sub_tokens = self.tokenizer.tokenize(token)
@@ -324,7 +322,6 @@ class EntityModel():
                                              dim=1)
 
             # padding for spans
-            print(bert_spans_tensor.shape)
             num_spans = bert_spans_tensor.shape[1]
             spans_pad_length = max_spans - num_spans
             spans_mask_tensor = torch.full([1, num_spans], 1, dtype=torch.long)

@@ -120,7 +120,6 @@ def evaluate(model, batches, tot_gold):
     l_tot = 0
 
     for i in range(len(batches)):
-        print("batches", batches[i])
         output_dict = model.run_batch(batches[i], training=False)
         pred_ner = output_dict['pred_ner']
         for sample, preds in zip(batches[i], pred_ner):
@@ -264,7 +263,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.train_data = os.path.join(args.data_dir, 'train.json')
-    args.dev_data = os.path.join(args.data_dir, 'no_label_formatted.json')
+    args.dev_data = os.path.join(args.data_dir, 'dev.json')
     args.test_data = os.path.join(args.data_dir, 'test.json')
 
     if 'albert' in args.model:
