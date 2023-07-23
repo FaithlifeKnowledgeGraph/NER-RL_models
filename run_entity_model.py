@@ -158,12 +158,11 @@ def get_parser():
                         default='entity/entity_output',
                         help="output directory of the entity model")
 
-    parser.add_argument(
-        '--max_span_length',
-        type=int,
-        default=8,
-        help=
-        "spans w/ length up to max_span_length are considered as candidates")
+    parser.add_argument('--max_span_length',
+                        type=int,
+                        default=8,
+                        help=("spans w/ length up to max_span_length"+
+                            " are considered as candidates"))
     parser.add_argument('--train_batch_size',
                         type=int,
                         default=32,
@@ -176,33 +175,26 @@ def get_parser():
                         type=float,
                         default=1e-5,
                         help="learning rate for the BERT encoder")
-    parser.add_argument(
-        '--task_learning_rate',
-        type=float,
-        default=1e-4,
-        help=
-        "learning rate for task-specific parameters, i.e., classification head"
-    )
-    parser.add_argument(
-        '--warmup_proportion',
-        type=float,
-        default=0.1,
-        help="the ratio of the warmup steps to the total steps")
+    parser.add_argument('--task_learning_rate',
+                        type=float,
+                        default=1e-4,
+                        help="learning rate for task-specific parameters")
+    parser.add_argument('--warmup_proportion',
+                        type=float,
+                        default=0.1,
+                        help="ratio of the warmup steps to the total steps")
     parser.add_argument('--num_epoch',
                         type=int,
                         default=100,
                         help="number of the training epochs")
-    parser.add_argument(
-        '--print_loss_step',
-        type=int,
-        default=100,
-        help="how often logging the loss value during training")
-    parser.add_argument(
-        '--eval_per_epoch',
-        type=int,
-        default=1,
-        help="how often evaluating the trained model on dev set during training"
-    )
+    parser.add_argument('--print_loss_step',
+                        type=int,
+                        default=100,
+                        help="how often logging loss val in training")
+    parser.add_argument('--eval_per_epoch',
+                        type=int,
+                        default=1,
+                        help="how often eval model on dev set in training")
     parser.add_argument("--bertadam",
                         action="store_true",
                         help="If bertadam, then set correct_bias = False")
@@ -213,12 +205,14 @@ def get_parser():
     parser.add_argument('--train_shuffle',
                         action='store_true',
                         help="whether to train with randomly shuffled data")
-    parser.add_argument('--do_eval',
+
+    parser.add_argument('--do_eval_dev',
                         action='store_true',
-                        help="whether to run evaluation")
-    parser.add_argument('--eval_test',
+                        help="whether to run evaluation on dev set")
+    parser.add_argument('--do_eval_test',
                         action='store_true',
                         help="whether to evaluate on test set")
+
     parser.add_argument('--dev_pred_filename',
                         type=str,
                         default="ent_pred_dev.json",
@@ -240,7 +234,9 @@ def get_parser():
                         default=None,
                         help="the base model directory")
 
-    parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--seed',
+                        type=int,
+                        default=0)
 
     parser.add_argument('--context_window',
                         type=int,
@@ -355,17 +351,32 @@ if __name__ == '__main__':
                                     (_, f1 * 100))
                         save_model(model, args)
 
-    if args.do_eval:
+    if args.do_eval_dev:
         args.bert_model_dir = args.output_dir
         model = EntityModel(args, num_ner_labels=num_ner_labels)
-        if args.eval_test:
-            test_data = Dataset(args.test_data)
-            prediction_file = os.path.join(args.output_dir,
-                                           args.test_pred_filename)
-        else:
-            test_data = Dataset(args.dev_data)
-            prediction_file = os.path.join(args.output_dir,
-                                           args.dev_pred_filename)
+
+        test_data = Dataset(args.dev_data)
+        prediction_file = os.path.join(args.output_dir,
+                                        args.dev_pred_filename)
+
+        test_samples, test_ner = convert_dataset_to_samples(
+            test_data,
+            args.max_span_length,
+            ner_label2id=ner_label2id,
+            context_window=args.context_window)
+        test_batches = batchify(test_samples, args.eval_batch_size)
+        evaluate(model, test_batches, test_ner)
+        output_ner_predictions(model,
+                               test_batches,
+                               test_data,
+                               output_file=prediction_file)
+
+    if args.do_eval_test:
+        args.bert_model_dir = args.output_dir
+        model = EntityModel(args, num_ner_labels=num_ner_labels)
+        test_data = Dataset(args.test_data)
+        prediction_file = os.path.join(args.output_dir,
+                                        args.test_pred_filename)
         test_samples, test_ner = convert_dataset_to_samples(
             test_data,
             args.max_span_length,
