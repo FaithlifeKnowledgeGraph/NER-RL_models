@@ -6,7 +6,7 @@ import numpy as np
 import logging
 import random
 import time
-import argparse
+import jsonargparse
 import torch
 
 torch.cuda.empty_cache()
@@ -71,22 +71,10 @@ def output_ner_predictions(model, batches, dataset, output_file):
 
 
 task_ner_labels = {
-    'ace04': ['FAC', 'WEA', 'LOC', 'VEH', 'GPE', 'ORG', 'PER'],
-    'ace05': ['FAC', 'WEA', 'LOC', 'VEH', 'GPE', 'ORG', 'PER'],
-    'scierc': [
-        'Method', 'OtherScientificTerm', 'Task', 'Generic', 'Material',
-        'Metric'
-    ],
     'faithlife': ['concept', 'writing', 'person', 'place']
 }
 
 task_rel_labels = {
-    'ace04': ['PER-SOC', 'OTHER-AFF', 'ART', 'GPE-AFF', 'EMP-ORG', 'PHYS'],
-    'ace05': ['ART', 'ORG-AFF', 'GEN-AFF', 'PHYS', 'PER-SOC', 'PART-WHOLE'],
-    'scierc': [
-        'PART-OF', 'USED-FOR', 'FEATURE-OF', 'CONJUNCTION', 'EVALUATE-FOR',
-        'HYPONYM-OF', 'COMPARE'
-    ],
     'faithlife': ['rel:TRUE']
 }
 
@@ -150,22 +138,21 @@ def setseed(seed):
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
+def get_parser():
+    parser = jsonargparse.ArgumentParser()
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", 
+                        action=jsonargparse.ActionConfigFile)
 
     parser.add_argument('--task',
                         type=str,
-                        default=None,
-                        required=True,
-                        choices=['ace04', 'ace05', 'scierc', 'faithlife'])
+                        default='faithlife',
+                        choices=['faithlife'])
 
-    parser.add_argument(
-        '--data_dir',
-        type=str,
-        default='data',
-        # required=True,
-        help="path to the preprocessed dataset")
+    parser.add_argument('--data_dir',
+                        type=str,
+                        default='data',
+                        help="path to the preprocessed dataset")
     parser.add_argument('--output_dir',
                         type=str,
                         default='entity/entity_output',
@@ -257,14 +244,24 @@ if __name__ == '__main__':
 
     parser.add_argument('--context_window',
                         type=int,
-                        required=True,
-                        default=None,
+                        default=0,
                         help="the context window size W for the entity model")
 
+    return parser
+
+def get_args():
+    parser = get_parser()
     args = parser.parse_args()
+
     args.train_data = os.path.join(args.data_dir, 'train.json')
     args.dev_data = os.path.join(args.data_dir, 'dev.json')
     args.test_data = os.path.join(args.data_dir, 'test.json')
+
+    return args
+
+if __name__ == '__main__':
+
+    args = get_args()
 
     if 'albert' in args.model:
         logger.info('Use Albert: %s' % args.model)
@@ -380,3 +377,4 @@ if __name__ == '__main__':
                                test_batches,
                                test_data,
                                output_file=prediction_file)
+
