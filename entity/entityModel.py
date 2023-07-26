@@ -206,20 +206,20 @@ class EntityModel():
     def __init__(self, args, num_ner_labels) -> None:
         super().__init__()
 
-        bert_model_name = args.model
+        bert_model_name = args['model']
         vocab_name = bert_model_name
 
-        if args.bert_model_dir is not None:
-            bert_model_name = str(args.bert_model_dir) + '/'
+        if args['bert_model_dir'] is not None:
+            bert_model_name = str(args['bert_model_dir']) + '/'
             vocab_name = bert_model_name
             logger.info('Loading BERT model from {}'.format(bert_model_name))
 
-        if args.use_albert:
+        if args['use_albert']:
             self.tokenizer = AlbertTokenizer.from_pretrained(vocab_name)
             self.bert_model = AlbertForEntity.from_pretrained(
                 bert_model_name,
                 num_ner_labels=num_ner_labels,
-                max_span_length=args.max_span_length,
+                max_span_length=args['max_span_length'],
                 return_dict=False,
                 ignore_mismatched_sizes=True)
         else:
@@ -227,7 +227,7 @@ class EntityModel():
             self.bert_model = BertForEntity.from_pretrained(
                 bert_model_name,
                 num_ner_labels=num_ner_labels,
-                max_span_length=args.max_span_length,
+                max_span_length=args['max_span_length'],
                 return_dict=False,
                 ignore_mismatched_sizes=True)
 

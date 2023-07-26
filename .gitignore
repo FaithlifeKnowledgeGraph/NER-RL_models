@@ -1,5 +1,10 @@
 run_*/
 
+# Cluster related
+condor/
+entity/ent-bert-ctx0/
+entity/ent-bert-ctx300/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
