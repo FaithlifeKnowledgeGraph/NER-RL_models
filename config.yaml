@@ -1,4 +1,5 @@
 loader:
+  path_to_logos_PURE: "data/all_data.json"
   max_data_size: 5000
 
 processor:

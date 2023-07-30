@@ -17,7 +17,7 @@ args = parse_yaml()
 
 print("Training Model with args: ", args)
 
-loader = LogosPUREDataLoader("data/train.json", **args['loader'])
+loader = LogosPUREDataLoader(**args['loader'])
 processor = RelationProcessor(loader.data, **args['processor'])
 train_loader, test_loader, y_test = processor.create_dataset()
 vocab_size = processor.get_vocab_size()
