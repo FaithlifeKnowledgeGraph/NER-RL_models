@@ -1,0 +1,12 @@
+nn_optimizer:
+  epochs: 1
+  batch_size: 256
+  shuffle: true
+  optimizer: adam
+  learning_rate: 0.01
+  loss: binary_crossentropy
+
+nn_model:
+  embedding_dim: 100
+  hidden_dim: 128
+  num_layers: 2

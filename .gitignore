@@ -1,4 +1,5 @@
 run_*/
+data/
 
 # Cluster related
 condor/
