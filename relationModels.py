@@ -27,8 +27,8 @@ class RelationModels(nn.Module):
     def create_optimizer(self) -> optim.Optimizer:
         return optim.Adam(self.model.parameters(), lr=self.nn_optimizer['learning_rate'])
     
-    def forward(self, sentences, entities):
-        return self.model(sentences, entities)
+    def forward(self, sentences):
+        return self.model(sentences)
 
     def fit(self, dataloader: torch.utils.data.DataLoader):
         for epoch in range(self.nn_optimizer['epochs']):

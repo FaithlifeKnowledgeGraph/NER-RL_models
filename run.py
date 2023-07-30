@@ -17,18 +17,14 @@ args = parse_yaml()
 
 print("Training Model with args: ", args)
 
-MAX_DATA_SIZE = 10000
-loader = LogosPUREDataLoader("data/train.json", MAX_DATA_SIZE)
-
-processor = RelationProcessor(args['nn_optimizer']['batch_size'], loader.data)
+loader = LogosPUREDataLoader("data/train.json", **args['loader'])
+processor = RelationProcessor(loader.data, **args['processor'])
 train_loader, test_loader, y_test = processor.create_dataset()
+vocab_size = processor.get_vocab_size()
 
-# Create model
-vocab_size = len(processor.vocab)
-model = SimpleRelationExtractionModel(vocab_size, **args['nn_model'])
-print("Created Model")
+relation_model = SimpleRelationExtractionModel(vocab_size, **args['nn_model'])
+model = RelationModels(relation_model, args)
 
-model = RelationModels(model, args)
 trainer = RelationTrainer({}, model, y_test)
 trainer.run(train_loader, test_loader)
 

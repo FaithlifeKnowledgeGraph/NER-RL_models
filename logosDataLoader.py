@@ -1,3 +1,5 @@
+# Class to load the Logos PURE formatted dataset for binary relation extraction
+
 import json 
 from itertools import combinations
 from typing import List
@@ -5,7 +7,14 @@ from typing import List
 OUTPUT_FILE_PATH = "data/transformed_data.json"
 
 class LogosPUREDataLoader:
-    def __init__(self, path_to_logos_PURE, max_data_size=50000) -> None:
+    def __init__(self, path_to_logos_PURE: str, max_data_size: int = 50000) -> None:
+        """Class that transforms the Logos PURE formatted dataset for 
+        binary relation extraction.
+
+        Attributes:
+            path_to_logos_PURE: Path to the Logos PURE formatted dataset
+            max_data_size: Maximum number of data points to use
+        """
         self.docs = self._load_old_file(path_to_logos_PURE)
         self.max_data_size = max_data_size
         self.transformed_data = self._transform_old_file()
@@ -18,7 +27,7 @@ class LogosPUREDataLoader:
             json_data = json.load(f)
         return json_data
 
-    def _load_old_file(self, path_to_logos_PURE):
+    def _load_old_file(self, path_to_logos_PURE: str) -> List[dict]:
         docs = [json.loads(line) for line in open(path_to_logos_PURE)]
         return docs
     

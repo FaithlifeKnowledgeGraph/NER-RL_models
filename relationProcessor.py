@@ -1,3 +1,5 @@
+import pandas as pd
+
 from collections import Counter
 from torch.nn.utils.rnn import pad_sequence
 from torch import LongTensor
@@ -7,14 +9,31 @@ from torch.utils.data import TensorDataset, DataLoader
 
 
 class RelationProcessor:
-    def __init__(self, batch_size, data):
-        self.batch_size = batch_size
+    def __init__(self, data: dict, batch_size: int, test_ratio: float):
         self.data = data
+        self.batch_size = batch_size
         self.vocab = self.create_vocab()
 
+    def create_even_class_size(self):
+        df = pd.DataFrame(self.data)
+
+        positive_class_df = df[df['relation'] == 1]
+        positive_class_size = positive_class_df.shape[0]
+
+        sampled_negative_class_df = df[df['relation'] == 0].sample(n=positive_class_size, random_state=42)
+
+        df = pd.concat([positive_class_df, sampled_negative_class_df])
+
+        print("Size of positive class: ", positive_class_size)
+        print("Size of negative class: ", sampled_negative_class_df.shape[0])
+        return df.to_dict(orient='records')
+
     def create_dataset(self):
+        self.data = self.create_even_class_size()
         sequences, labels = self.create_sequences_and_labels()
-        X_train, X_test, y_train, y_test = train_test_split(sequences, labels, test_size=0.5, random_state=42)
+
+        # Evenly divide the dataset distribution 
+        X_train, X_test, y_train, y_test = train_test_split(sequences, labels, test_size=0.3, random_state=42)
 
 
         # Create Dataloaders
@@ -37,6 +56,9 @@ class RelationProcessor:
         vocabulary['<PAD>'] = len(vocabulary)
 
         return vocabulary
+
+    def get_vocab_size(self):
+        return len(self.vocab)
     
     def create_sequences_and_labels(self):
         sequences = []
