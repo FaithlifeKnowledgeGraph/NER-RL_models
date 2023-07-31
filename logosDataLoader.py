@@ -20,6 +20,7 @@ class LogosPUREDataLoader:
         self.transformed_data = self._transform_old_file()
         
         self.data = self._load_json_file(OUTPUT_FILE_PATH)
+        print("size of data:", len(self.data))
 
     
     def _load_json_file(self, output_file_path: str) -> List[List[str]]:

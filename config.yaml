@@ -1,13 +1,13 @@
 loader:
   path_to_logos_PURE: "data/all_data.json"
-  max_data_size: 5000
+  max_data_size: -1
 
 processor:
-  batch_size: 256
+  batch_size: 1028
   test_ratio: 0.3
 
 nn_optimizer:
-  epochs: 1
+  epochs: 10
   batch_size: 256
   shuffle: true
   optimizer: adam
@@ -15,6 +15,8 @@ nn_optimizer:
   loss: binary_crossentropy
 
 nn_model:
-  embedding_dim: 100
+  embedding_dim: 200
   hidden_dim: 128
-  num_layers: 2
+  num_layers: 4
+
+

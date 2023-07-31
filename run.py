@@ -19,12 +19,12 @@ print("Training Model with args: ", args)
 
 loader = LogosPUREDataLoader(**args['loader'])
 processor = RelationProcessor(loader.data, **args['processor'])
-train_loader, test_loader, y_test = processor.create_dataset()
+train_loader, val_loader, test_loader, y_test = processor.create_dataset()
 vocab_size = processor.get_vocab_size()
 
 relation_model = SimpleRelationExtractionModel(vocab_size, **args['nn_model'])
 model = RelationModels(relation_model, args)
 
 trainer = RelationTrainer({}, model, y_test)
-trainer.run(train_loader, test_loader)
+trainer.run(train_loader, val_loader, test_loader)
 

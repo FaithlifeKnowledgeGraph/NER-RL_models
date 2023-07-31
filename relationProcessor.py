@@ -34,17 +34,20 @@ class RelationProcessor:
 
         # Evenly divide the dataset distribution 
         X_train, X_test, y_train, y_test = train_test_split(sequences, labels, test_size=0.3, random_state=42)
+        X_test, X_val, y_test, y_val = train_test_split(X_test, y_test, test_size=0.5, random_state=42)
 
 
         # Create Dataloaders
-        batch_size = self.batch_size
         train_dataset = TensorDataset(X_train, y_train)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size)
+
+        val_dataset = TensorDataset(X_val, y_val)
+        val_loader = DataLoader(val_dataset, batch_size=self.batch_size)
 
         test_dataset = TensorDataset(X_test, y_test)
-        test_loader = DataLoader(test_dataset, batch_size=batch_size)
+        test_loader = DataLoader(test_dataset, batch_size=self.batch_size)
 
-        return train_loader, test_loader, y_test
+        return train_loader, val_loader, test_loader, y_test
 
     def create_vocab(self):
         word_counter = Counter()
