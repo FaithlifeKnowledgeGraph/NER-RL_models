@@ -7,7 +7,7 @@ processor:
   test_ratio: 0.3
 
 nn_optimizer:
-  epochs: 10
+  epochs: 3
   batch_size: 256
   shuffle: true
   optimizer: adam
@@ -15,8 +15,9 @@ nn_optimizer:
   loss: binary_crossentropy
 
 nn_model:
-  embedding_dim: 200
+  embedding_dim: 100
   hidden_dim: 128
-  num_layers: 4
+  num_layers: 2
 
-
+trainer:
+  run_name: mock_run

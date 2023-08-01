@@ -25,6 +25,6 @@ vocab_size = processor.get_vocab_size()
 relation_model = SimpleRelationExtractionModel(vocab_size, **args['nn_model'])
 model = RelationModels(relation_model, args)
 
-trainer = RelationTrainer({}, model, y_test)
+trainer = RelationTrainer(args, model, y_test)
 trainer.run(train_loader, val_loader, test_loader)
 
