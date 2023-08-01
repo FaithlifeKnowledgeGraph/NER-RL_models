@@ -15,12 +15,12 @@ class RelationModels(nn.Module):
             "loss": "binary_crossentropy"
         },
     }
-    def __init__(self, model, hp=None):
+    def __init__(self, model, args=None):
         super(RelationModels, self).__init__()
-        if hp is None:
-            hp = self.DEFAULT_CONFIG
+        if args is None:
+            args = self.DEFAULT_CONFIG
         self.model = model
-        self.nn_optimizer = hp['nn_optimizer']
+        self.nn_optimizer = args['nn_optimizer']
         self.optimizer = self.create_optimizer()
         self.loss_function = nn.BCELoss() if self.nn_optimizer['loss'] == "binary_crossentropy" else nn.CrossEntropyLoss()
     

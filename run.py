@@ -18,6 +18,7 @@ def main(args):
     loader = LogosPUREDataLoader("data/train.json", MAX_DATA_SIZE)
 
     processor = RelationProcessor(args['nn_optimizer']['batch_size'], loader.data)
+    processor.add_typed_markers(verbose=True)
     train_loader, test_loader, y_test = processor.create_dataset()
 
     # Create model

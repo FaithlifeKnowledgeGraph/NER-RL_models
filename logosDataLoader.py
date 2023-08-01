@@ -42,17 +42,29 @@ class LogosPUREDataLoader:
 
             # Iterate over the sentences, entities, and relations
             for sentence, sentence_entities, sentence_relations in zip(sentences, entities, relations):
-                sentence_str = ' '.join(sentence)  # convert list of tokens into a string
 
-                # If there are no entities in the sentence, continue to the next sentence
-                if not sentence_entities:
+                # Delete dups entities
+                unique_entity = []
+                [unique_entity.append(entity) for entity in sentence_entities 
+                    if entity not in unique_entity]
+                sentence_entities = unique_entity
+
+                # Delete dups relations
+                unique_relation = []
+                [unique_relation.append(relation) for relation in sentence_relations 
+                    if relation not in unique_relation]
+                sentence_relations = unique_relation
+
+                # If there is no/only 1 entity in the sentence, continue to the next sentence
+                if len(sentence_entities) <= 1:
                     cumulative_len += len(sentence)  # update cumulative length
                     continue
 
                 # Create entity dictionary with start_pos and end_pos, and add entity name
                 sentence_entities = [{'entity': ' '.join(sentence[entity[0]-cumulative_len:entity[1]-cumulative_len+1]), 
                                     'start_pos': entity[0]-cumulative_len, 'end_pos': entity[1]-cumulative_len,
-                                    'doc_start_pos': entity[0], 'doc_end_pos': entity[1]} 
+                                    'doc_start_pos': entity[0], 'doc_end_pos': entity[1],
+                                    'type': entity[2]} 
                                     for entity in sentence_entities]
 
                 # Generate all possible pairs of entities
@@ -72,9 +84,11 @@ class LogosPUREDataLoader:
                     
                     # Create the new record without the document level positions
                     new_record = {
-                        'sentence': sentence_str,
-                        'entities': [{'entity': pair[0]['entity'], 'start_pos': pair[0]['start_pos'], 'end_pos': pair[0]['end_pos']},
-                                    {'entity': pair[1]['entity'], 'start_pos': pair[1]['start_pos'], 'end_pos': pair[1]['end_pos']}],
+                        'sentence': sentence,
+                        'entities': [{'entity': pair[0]['entity'], 'start_pos': pair[0]['start_pos'], 
+                                    'end_pos': pair[0]['end_pos'], 'type': pair[0]['type']},
+                                    {'entity': pair[1]['entity'], 'start_pos': pair[1]['start_pos'],
+                                    'end_pos': pair[1]['end_pos'], 'type': pair[1]['type']}],
                         'relation': relation_val
                     }
                     transformed_data.append(new_record)
