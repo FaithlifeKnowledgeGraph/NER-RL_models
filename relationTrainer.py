@@ -9,12 +9,13 @@ class RelationTrainer:
         self.model = model
         self.y_test = y_test
 
-    def run(self, train_loader, test_loader):
+    def run(self, train_loader, val_loader, test_loader):
         print("Training Model")
-        self._train_model(train_loader, test_loader)
+        self._train_model(train_loader, val_loader, test_loader)
 
     
     def _train_model(self, train_loader: torch.utils.data.DataLoader, 
+                     val_loader: torch.utils.data.DataLoader,
                      test_loader: torch.utils.data.DataLoader):
         model, history = self._fit_model(train_loader)
         self._evaluate_model(model, test_loader)

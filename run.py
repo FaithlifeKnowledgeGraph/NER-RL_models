@@ -13,26 +13,18 @@ def parse_yaml(f_path='config.yaml'):
         except yaml.YAMLError as exc:
             print(exc)
 
-def main(args):
-    MAX_DATA_SIZE = 10000
-    loader = LogosPUREDataLoader("data/train.json", MAX_DATA_SIZE)
+args = parse_yaml()
 
-    processor = RelationProcessor(args['nn_optimizer']['batch_size'], loader.data)
-    processor.add_typed_markers(verbose=True)
-    train_loader, test_loader, y_test = processor.create_dataset()
+print("Training Model with args: ", args)
 
-    # Create model
-    vocab_size = len(processor.vocab)
-    model = SimpleRelationExtractionModel(vocab_size, **args['nn_model'])
-    print("Created Model")
+loader = LogosPUREDataLoader(**args['loader'])
+processor = RelationProcessor(loader.data, **args['processor'])
+processor.add_typed_markers(verbose=True)
+train_loader, val_loader, test_loader, y_test = processor.create_dataset()
+vocab_size = processor.get_vocab_size()
 
-    model = RelationModels(model, args)
-    trainer = RelationTrainer({}, model, y_test)
-    trainer.run(train_loader, test_loader)
+relation_model = SimpleRelationExtractionModel(vocab_size, **args['nn_model'])
+model = RelationModels(relation_model, args)
 
-
-if __name__ == '__main__':
-    args = parse_yaml()
-    print("Training Model with args: ", args)
-
-    main(args)
+trainer = RelationTrainer({}, model, y_test)
+trainer.run(train_loader, val_loader, test_loader)

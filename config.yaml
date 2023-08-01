@@ -1,33 +1,22 @@
+loader:
+  path_to_logos_PURE: "data/all_data.json"
+  max_data_size: -1
+
+processor:
+  batch_size: 1028
+  test_ratio: 0.3
+
 nn_optimizer:
   epochs: 10
-  batch_size: 32
+  batch_size: 256
   shuffle: true
   optimizer: adam
   learning_rate: 0.01
   loss: binary_crossentropy
 
 nn_model:
-  embedding_dim: 100
+  embedding_dim: 200
   hidden_dim: 128
-  num_layers: 2
-
-# torch:
-#   device: 'cpu'
-#   seed: 0
-
-# data_path:
-#   train: 'data/train.json'
-#   valid: 'data/dev.json'
-#   test : 'data/test.json'
+  num_layers: 4
 
 
-# nn_optimizer:
-#   optimizer_class: Adam  # Adam, AdamW, SGD
-#   params:
-#     lr: 0.001
-
-# train:
-#   epochs: 5
-#   batch_size: 64
-#   shuffle: True
-#   loss: binary_crossentropy
