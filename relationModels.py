@@ -23,12 +23,26 @@ class RelationModels(nn.Module):
         self.nn_optimizer = args['nn_optimizer']
         self.optimizer = self.create_optimizer()
         self.loss_function = nn.BCELoss() if self.nn_optimizer['loss'] == "binary_crossentropy" else nn.CrossEntropyLoss()
-    
+
+        if args['torch']['device'] == 'cuda':
+            torch.cuda.empty_cache()
+            if not torch.cuda.is_available():
+                print('No CUDA found!')
+                exit(-1)
+            self._model_device = 'cuda'
+            self.model.cuda()
+            print(f"Running on GPU: {torch.cuda.device_count()} GPUs")
+            if torch.cuda.device_count() > 1:
+                self.bert_model = torch.nn.DataParallel(self.bert_model)
+        else:
+            self._model_device = 'cpu'
+            print("Running on CPU")
+
     def create_optimizer(self) -> optim.Optimizer:
         return optim.Adam(self.model.parameters(), lr=self.nn_optimizer['learning_rate'])
     
     def forward(self, sentences):
-        return self.model(sentences)
+        return self.model(sentences.to(self._model_device))
 
     def fit(self, dataloader: torch.utils.data.DataLoader):
         for epoch in range(self.nn_optimizer['epochs']):
@@ -36,8 +50,9 @@ class RelationModels(nn.Module):
             total_loss = 0
             for X_batch, y_batch in dataloader:
                 self.optimizer.zero_grad()
-                y_pred = self.model(X_batch)
-                loss = self.loss_function(y_pred, y_batch.float().view(-1, 1))
+                y_pred = self.model(X_batch.to(self._model_device))
+                loss = self.loss_function(y_pred.to(self._model_device), 
+                    y_batch.to(self._model_device).float().view(-1, 1))
                 loss.backward()
                 self.optimizer.step()
                 total_loss += loss.item()
@@ -48,7 +63,7 @@ class RelationModels(nn.Module):
         total_loss = 0
         y_pred = []
         for X_batch, y_batch in test_loader:
-            y_pred.append(self.model(X_batch))
+            y_pred.append(self.model(X_batch.to(self._model_device)))
             print(f"Test loss: {total_loss/len(test_loader)}")
         return None, torch.cat(y_pred, dim=0)
 

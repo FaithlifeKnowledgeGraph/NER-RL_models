@@ -1,3 +1,7 @@
+torch:
+  device: 'cuda'
+  seed: 42 # For global seed
+
 loader:
   path_to_logos_PURE: "data/train.json"
   max_data_size: -1
@@ -21,3 +25,4 @@ nn_model:
 
 trainer:
   run_name: mock_run
+  on_cluster: False

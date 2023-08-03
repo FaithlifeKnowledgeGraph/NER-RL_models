@@ -13,9 +13,17 @@ def parse_yaml(f_path='config.yaml'):
         except yaml.YAMLError as exc:
             print(exc)
 
+def set_global_seed(seed: int):
+    random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
 args = parse_yaml()
 
 print("Training Model with args: ", args)
+
+set_global_seed(args['torch']['seed'])
 
 loader = LogosPUREDataLoader(**args['loader'])
 processor = RelationProcessor(loader.data, **args['processor'])
