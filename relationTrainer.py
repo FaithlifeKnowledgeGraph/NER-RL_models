@@ -4,6 +4,7 @@ import mlflow.pytorch
 
 from metrics import ClassificationMetrics
 
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
 class RelationTrainer:
     def __init__(self, params: dict, model: torch.nn, y_test) -> None:

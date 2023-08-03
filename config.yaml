@@ -1,5 +1,5 @@
 loader:
-  path_to_logos_PURE: "data/all_data.json"
+  path_to_logos_PURE: "data/train.json"
   max_data_size: -1
 
 processor:
@@ -7,7 +7,7 @@ processor:
   test_ratio: 0.3
 
 nn_optimizer:
-  epochs: 3
+  epochs: 1
   batch_size: 256
   shuffle: true
   optimizer: adam

@@ -1,6 +1,7 @@
 run_*/
 data/
 mlruns/
+mlartifacts/
 
 # Cluster related
 condor/
