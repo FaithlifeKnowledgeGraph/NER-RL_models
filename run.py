@@ -2,6 +2,8 @@ import yaml
 import random
 import torch
 
+from logos_data_loader import LogosDataLoader
+
 def parse_yaml(f_path: str = 'config.yaml'):
     with open(f_path, 'r') as f:
         try:
@@ -22,3 +24,7 @@ if __name__ == "__main__":
     print("Training Model with args: ", args)
 
     set_global_seed(args['torch']['seed'])
+
+    loader = LogosDataLoader(**args['loader'])
+    loader.run()
+    print(len(loader.data))
