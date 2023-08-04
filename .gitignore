@@ -1,5 +1,5 @@
 run_*/
-data/*
+data/
 ml*/
 
 # Cluster related
