@@ -99,7 +99,6 @@ class LogosDataLoader:
                     cumulative_len += len(sentence)  
                     continue
 
-                # Create entity dictionary with start_pos and end_pos, and add entity name
                 sentence_entities = [{'entity': ' '.join(sentence[entity[0]-cumulative_len:entity[1]-cumulative_len+1]), 
                                     'start_pos': entity[0]-cumulative_len, 'end_pos': entity[1]-cumulative_len,
                                     'doc_start_pos': entity[0], 'doc_end_pos': entity[1],
@@ -114,7 +113,14 @@ class LogosDataLoader:
                     sub_ent = pair[0]
                     obj_ent = pair[1]
 
-                    # Check if there is a relation between the pair
+                    # Pos overlapping = anomalies 
+                    if (obj_ent['doc_start_pos'] <= sub_ent['doc_start_pos'] <= obj_ent['doc_end_pos']) \
+                        or (sub_ent['doc_start_pos'] <= obj_ent['doc_start_pos'] <= sub_ent['doc_end_pos']) \
+                        or (obj_ent['doc_start_pos'] <= sub_ent['doc_end_pos'] <= obj_ent['doc_end_pos']) \
+                        or (sub_ent['doc_start_pos'] <= obj_ent['doc_end_pos'] <= sub_ent['doc_end_pos']):
+                        cumulative_len += len(sentence)  
+                        continue
+
                     relation_val = 0
                     for relation in sentence_relations:
                         if ((sub_ent['doc_start_pos'] == relation[0] and sub_ent['doc_end_pos'] == relation[1]) and
@@ -123,7 +129,6 @@ class LogosDataLoader:
                             relation_val = 1
                             break
                     
-                    # Create the new record without the document level positions
                     new_record = {
                         'sentence': sentence,
                         'entities': [{'entity': sub_ent['entity'], 'start_pos': sub_ent['start_pos'], 
@@ -137,4 +142,3 @@ class LogosDataLoader:
                 cumulative_len += len(sentence)
 
         return transformed_data
-    
