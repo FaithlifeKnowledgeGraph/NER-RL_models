@@ -16,6 +16,7 @@ class LogosDataLoader:
         max_data_size: Maximum number of data points to use
         is_PURE_format: If given file contains data in PURE format 
         data: Data in correct format
+
     """
 
     def __init__(self, data_path: str, max_data_size: int = 50000, is_PURE_format: bool = False) -> None:
@@ -25,6 +26,7 @@ class LogosDataLoader:
             data_path: Path to file contain data
             max_data_size: Maximum number of data points to use
             is_PURE_format: If given file contains data in PURE format 
+
         """
 
         self.data_path = data_path
@@ -39,7 +41,8 @@ class LogosDataLoader:
         Data length is at most max_data_size
 
         Returns:
-            List[dict]: data in correct format
+            Data in correct format
+
         """
 
         if (self.is_PURE_format):
@@ -56,10 +59,14 @@ class LogosDataLoader:
 
         Args:
             output_file_path: path to desire output file, create file if not exist 
+        
+        Raises:
+            Exception: if data not loaded yet
+
         """
 
         if self.data is None:
-            print("No data to export!")
+            raise Exception ("No data to export!")
 
         with open(output_file_path, 'w') as output_file:
             for d in self.data:
