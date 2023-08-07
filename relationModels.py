@@ -27,8 +27,7 @@ class RelationModels(nn.Module):
         if args['torch']['device'] == 'cuda':
             torch.cuda.empty_cache()
             if not torch.cuda.is_available():
-                print('No CUDA found!')
-                exit(-1)
+                Exception('No CUDA found!')
             self._model_device = 'cuda'
             self.model.cuda()
             print(f"Running on GPU: {torch.cuda.device_count()} GPUs")

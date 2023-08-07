@@ -1,14 +1,15 @@
 torch:
-  device: 'cuda'
+  device: 'cpu'
   seed: 42 # For global seed
 
 loader:
-  path_to_logos_PURE: "data/train.json"
-  max_data_size: -1
+  data_path: "data/all_data.json"
+  max_data_size: null # null = None = no limit
+  is_PURE_format: True
 
 processor:
   batch_size: 1028
-  test_ratio: 0.3
+  val_test_ratio: 0.3
 
 nn_optimizer:
   epochs: 1
