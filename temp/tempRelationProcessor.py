@@ -33,6 +33,8 @@ class TempRelationProcessor:
 
         # print(len(tokenizer))
         # tokenizer_len = 30538
+        # with open('../data/data.pkl', 'wb') as f:
+        #     pickle.dump(features, f)
 
         with open('../data/data.pkl', 'rb') as f:
             features = pickle.load(f)
@@ -154,7 +156,7 @@ class TempRelationProcessor:
         
         return train_loader, val_loader, test_loader, y_test
 
-    def _create_a_dataset(features, return_labels=False):
+    def _create_a_dataset(self, features, return_labels=False):
 
         all_input_ids = pad_sequence([LongTensor(f.input_ids) for f in features],
                                     batch_first=True)

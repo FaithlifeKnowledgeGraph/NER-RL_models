@@ -9,6 +9,8 @@ from transformers import AdamW
 from tempRelationProcessor import TempRelationProcessor
 from relationModel import MyBertForRelation
 
+from torch import nn
+
 def parse_yaml(f_path: str = 'config.yaml') -> dict:
     """Parse a YAML file containing training configuration 
 
@@ -56,7 +58,9 @@ if __name__ == "__main__":
     processor = TempRelationProcessor(data, **args['processor'])
     train_loader, val_loader, test_loader, y_test = processor.run()
 
-    model = MyBertForRelation(model_name='bert-base-uncased', device=args['torch']['device'], num_rel_labels=2)
+    model = MyBertForRelation(model_name='bert-base-uncased', num_rel_labels=2)
+    device = device=args['torch']['device']
+    model.to(device)
 
     optimizer = AdamW(model.bert.parameters(), lr=1e-5)
     criterion = nn.CrossEntropyLoss()
@@ -68,6 +72,7 @@ if __name__ == "__main__":
         for batch in train_loader:
             optimizer.zero_grad()
             input_ids, input_mask, segment_ids, label_id, sub_idx, obj_idx = batch
+            input_ids, input_mask, segment_ids, label_id, sub_idx, obj_idx = input_ids.to(device), input_mask.to(device), segment_ids.to(device), label_id.to(device), sub_idx.to(device), obj_idx .to(device)
             logits = model(input_ids, segment_ids, input_mask, sub_idx, obj_idx )
             loss = criterion(logits.view(-1, 2), label_ids.view(-1))
             loss.backward()
