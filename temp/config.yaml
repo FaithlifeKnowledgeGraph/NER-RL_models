@@ -1,0 +1,29 @@
+torch:
+  device: 'cuda'
+  seed: 42 # For global seed
+
+loader:
+  data_path: "data/all_data.json"
+  max_data_size: null # null = None = no limit
+  is_PURE_format: True
+
+processor:
+  bert_tokenizer_name: bert-base-uncased
+  batch_size: 32
+
+nn_optimizer:
+  epochs: 1
+  batch_size: 256
+  shuffle: true
+  optimizer: adam
+  learning_rate: 0.01
+  loss: binary_crossentropy
+
+nn_model:
+  embedding_dim: 100
+  hidden_dim: 128
+  num_layers: 2
+
+trainer:
+  run_name: mock_run
+  on_cluster: False
