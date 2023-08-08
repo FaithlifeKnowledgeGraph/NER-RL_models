@@ -10,7 +10,7 @@ import seaborn as sns
 class ClassificationMetrics:
     def __init__(self, y_true, y_pred, threshold=0.5):
         self.y_true = y_true.numpy()
-        self.y_pred = y_pred.detach().numpy()
+        self.y_pred = y_pred.cpu().detach().numpy()
         self.y_pred_label = (self.y_pred > threshold).astype(float)
 
     def accuracy(self):
