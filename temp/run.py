@@ -8,8 +8,10 @@ from transformers import AdamW
 
 from tempRelationProcessor import TempRelationProcessor
 from relationModel import MyBertForRelation
+from met import ClassificationMetrics
 
 from torch import nn
+import torch.nn.functional as F
 
 def parse_yaml(f_path: str = 'config.yaml') -> dict:
     """Parse a YAML file containing training configuration 
@@ -59,7 +61,15 @@ if __name__ == "__main__":
     train_loader, val_loader, test_loader, y_test = processor.run()
 
     model = MyBertForRelation(model_name='bert-base-uncased', num_rel_labels=2)
+    
     device = device=args['torch']['device']
+    if device == 'cuda':
+        torch.cuda.empty_cache()
+        if not torch.cuda.is_available():
+            Exception('No CUDA found!')
+        print("Running on CUDA")
+    else:
+        print("Running on CPU")
     model.to(device)
 
     optimizer = AdamW(model.bert.parameters(), lr=1e-5)
@@ -79,3 +89,29 @@ if __name__ == "__main__":
             optimizer.step()
             total_loss += loss.item()
         print(f"Epoch {epoch+1}/{num_epochs} - Loss: {total_loss/len(train_loader)}")
+
+    
+    model.eval()
+    y_pred = []
+    with torch.no_grad():
+        total_loss = 0
+        for batch in test_loader:
+            input_ids, input_mask, segment_ids, label_id, sub_idx, obj_idx = batch
+            input_ids, input_mask, segment_ids, label_id, sub_idx, obj_idx = input_ids.to(device), input_mask.to(device), segment_ids.to(device), label_id.to(device), sub_idx.to(device), obj_idx .to(device)
+            logits = model(input_ids, segment_ids, input_mask, sub_idx, obj_idx )
+            loss = criterion(logits.view(-1, 2), label_id.view(-1))
+            total_loss += loss.item()
+            probs = F.softmax(logits.detach(), dim=1)[:,1]
+            y_pred.append(probs)
+        print(f"Eval - Loss: {total_loss/len(test_loader)}")
+
+    y_pred = torch.cat(y_pred, dim=0)
+
+    metrics = ClassificationMetrics(y_test, y_pred)
+    print(f"Accuracy: {metrics.accuracy()}")
+    print(f"Precision: {metrics.precision()}")
+    print(f"Recall: {metrics.recall()}")
+    print(f"F1 Score: {metrics.f1()}")
+    print(f"AUC-ROC: {metrics.auc_roc()}")
+    tn, fp, fn, tp = metrics.calc_confusion_matrix()
+    print(f"Confusion Matrix: \ntn: {tn} fp: {fp} \nfn: {fn} tp: {tp}")
