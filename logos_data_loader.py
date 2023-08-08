@@ -125,7 +125,6 @@ class LogosDataLoader:
                         or (sub_ent['doc_start_pos'] <= obj_ent['doc_start_pos'] <= sub_ent['doc_end_pos']) \
                         or (obj_ent['doc_start_pos'] <= sub_ent['doc_end_pos'] <= obj_ent['doc_end_pos']) \
                         or (sub_ent['doc_start_pos'] <= obj_ent['doc_end_pos'] <= sub_ent['doc_end_pos']):
-                        cumulative_len += len(sentence)  
                         continue
 
                     relation_val = 0
