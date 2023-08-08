@@ -74,8 +74,8 @@ if __name__ == "__main__":
             input_ids, input_mask, segment_ids, label_id, sub_idx, obj_idx = batch
             input_ids, input_mask, segment_ids, label_id, sub_idx, obj_idx = input_ids.to(device), input_mask.to(device), segment_ids.to(device), label_id.to(device), sub_idx.to(device), obj_idx .to(device)
             logits = model(input_ids, segment_ids, input_mask, sub_idx, obj_idx )
-            loss = criterion(logits.view(-1, 2), label_ids.view(-1))
+            loss = criterion(logits.view(-1, 2), label_id.view(-1))
             loss.backward()
             optimizer.step()
-            running_loss += loss.item()
+            total_loss += loss.item()
         print(f"Epoch {epoch+1}/{num_epochs} - Loss: {total_loss/len(train_loader)}")
