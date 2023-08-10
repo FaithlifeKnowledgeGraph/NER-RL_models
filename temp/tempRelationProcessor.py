@@ -1,6 +1,6 @@
 # Process data and create dataloader for models
 # For binary relation extraction
-
+import os
 import random
 import pickle
 import pandas as pd
@@ -12,32 +12,36 @@ from torch import LongTensor
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import TensorDataset, DataLoader
 
-from transformers import BertTokenizer
+from transformers import AutoTokenizer
 from transformers.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 
 
 class TempRelationProcessor:
 
-    def __init__(self, data: list[dict], bert_tokenizer_name: str, batch_size: int):
+    def __init__(self, data: list[dict], model_name: str, batch_size: int):
         self.data = data
-        self.bert_tokenizer_name = bert_tokenizer_name
+        self.model_name = model_name
         self.batch_size = batch_size
 
     def run(self):
-        # tokenizer = BertTokenizer.from_pretrained(self.bert_tokenizer_name, cache_dir=str(PYTORCH_PRETRAINED_BERT_CACHE))
-        # ner_labels = ['concept', 'writing', 'person', 'place']
+        features = None
 
-        # tokenizer = self._add_marker_tokens(tokenizer, ner_labels)
+        pkl_f_path = f'../data/{self.model_name}_{self.batch_size}.pkl'
+        if not os.path.exists(pkl_f_path):
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name, cache_dir=str(PYTORCH_PRETRAINED_BERT_CACHE))
+            ner_labels = ['concept', 'writing', 'person', 'place']
 
-        # features = self._add_typed_markers(self.data, tokenizer)
+            tokenizer = self._add_marker_tokens(tokenizer, ner_labels)
 
-        # print(len(tokenizer))
-        # tokenizer_len = 30538
-        # with open('../data/data.pkl', 'wb') as f:
-        #     pickle.dump(features, f)
+            features = self._add_typed_markers(self.data, tokenizer)
 
-        with open('../data/data.pkl', 'rb') as f:
-            features = pickle.load(f)
+            print(len(tokenizer))
+            # tokenizer_len = 30538
+            with open(pkl_f_path, 'wb') as f:
+                pickle.dump(features, f)
+        else: 
+            with open(pkl_f_path, 'rb') as f:
+                features = pickle.load(f)
 
         train_loader, val_loader, test_loader, y_test = self._create_all_dataset(features)
 
