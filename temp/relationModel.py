@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from transformers import BertModel
+from transformers import AutoModel
 
 from transformers.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 
@@ -12,7 +12,7 @@ class MyBertForRelation(nn.Module):
     def __init__(self, model_name: str, num_rel_labels: int):
         super(MyBertForRelation, self).__init__()
 
-        self.bert = BertModel.from_pretrained(model_name, cache_dir=str(PYTORCH_PRETRAINED_BERT_CACHE))
+        self.bert = AutoModel.from_pretrained(model_name, cache_dir=str(PYTORCH_PRETRAINED_BERT_CACHE))
         tokenizer_len = 30538 # len(tokenizer) is pre calculated in TempRelationProcessor
         self.bert.resize_token_embeddings(tokenizer_len)
 
