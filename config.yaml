@@ -9,7 +9,7 @@ loader:
 
 processor:
   batch_size: 1028
-  test_ratio: 0.3
+  val_test_ratio: 0.3
 
 nn_optimizer:
   epochs: 1
